@@ -1,0 +1,2 @@
+pidxi x ali 10 
+didxa y ali "test" ;
