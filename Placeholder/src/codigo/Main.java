@@ -23,19 +23,39 @@ public class Main {
             System.out.println("¡ÉXITO! El código es válido en Placeholder.");
 
         } catch (SimboloInvalidoException e) {
-            System.err.println("[ERROR LÉXICO] " + e.getMessage());
-        } catch (FaltaPuntoYComaException e) {
-            System.err.println("[ERROR SINTÁCTICO] " + e.getMessage());
-        } catch (VariableNoDeclaradaException e) {
-            System.err.println("[ERROR SEMÁNTICO] " + e.getMessage());
-        } catch (TiposIncompatiblesException e) {
-            System.err.println("[ERROR SEMÁNTICO] " + e.getMessage());
-        } catch (PlaceholderException e) {
-            // Atrapa cualquier otra de tus 10 excepciones específicas
-            System.err.println("[ERROR DE COMPILACIÓN] " + e.getMessage());
-        } catch (Exception e) {
-            // Errores generales de Java (ej. archivo no encontrado)
-            System.err.println("[ERROR SISTEMA] " + e.getMessage());
-        }
+        System.err.println("[ERROR LÉXICO] " + e.getMessage());
+    } catch (IdentificadorInvalidoException e) {
+        System.err.println("[ERROR LÉXICO] " + e.getMessage());
+    } catch (FaltaPuntoYComaException e) {
+        System.err.println("[ERROR SINTÁCTICO] " + e.getMessage());
+    } catch (VariableNoDeclaradaException e) {
+        System.err.println("[ERROR SEMÁNTICO] " + e.getMessage());
+    } catch (VariableDuplicadaException e) {
+        System.err.println("[ERROR SEMÁNTICO] " + e.getMessage());
+    } catch (VariableNoInicializadaException e) {
+        System.err.println("[ERROR SEMÁNTICO] " + e.getMessage());
+    } catch (TiposIncompatiblesException e) {
+        System.err.println("[ERROR SEMÁNTICO] " + e.getMessage());
+    } catch (OperacionNoValidaException e) {
+        System.err.println("[ERROR SEMÁNTICO] " + e.getMessage());
+    } 
+    catch (DivisionPorCeroException e) {
+        System.err.println("[ERROR ARITMÉTICO] " + e.getMessage());
+    } catch (PlaceholderException e) {
+        System.err.println("[ERROR GENERAL] " + e.getMessage());
+    } catch (Exception e) {
+        System.err.println("[ERROR SISTEMA] Algo falló feo: " + e.getMessage());
+    } catch (FaltaOperandoException e) {
+        System.err.println("[ERROR ESTRUCTURA] " + e.getMessage());
+    } catch (PlaceholderException e) {
+    } catch (IncompatibilidadDeOperadoresException e) {
+        System.err.println("[ERROR SEMÁNTICO] " + e.getMessage());
+    } catch (VariableNoUtilizadaException e) {
+        System.err.println("[WARNING SEMÁNTICO] " + e.getMessage());
+    } catch (ConstanteModificadaException e) {
+        System.err.println("[ERROR DE ACCESO] " + e.getMessage());
+    } catch (ErrorDeFormatoCadenaException e) {
+        System.err.println("[ERROR LÉXICO] " + e.getMessage());
     }
+}
 }
