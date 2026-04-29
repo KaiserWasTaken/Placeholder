@@ -1,5 +1,3 @@
-package codigo;
-
 import java.util.HashMap;
 
 public class TablaSimbolos {

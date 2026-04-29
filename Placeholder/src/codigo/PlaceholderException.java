@@ -1,5 +1,3 @@
-package codigo;
-
 public class PlaceholderException extends RuntimeException { 
     private int linea;
     private int columna;
