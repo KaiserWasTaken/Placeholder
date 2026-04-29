@@ -1,0 +1,49 @@
+package analizadores;
+import java_cup.runtime.*;
+import excepciones.*;
+
+parser code {:
+    public void syntax_error(Symbol s){
+        throw new ExcepcionSintactica("Error de sintaxis cerca de: " + s.value, s.left, s.right);
+    }
+    public void unrecovered_syntax_error(Symbol s) throws Exception {
+        throw new ExcepcionSintactica("Error sintactico fatal: " + s.value, s.left, s.right);
+    }
+:};
+
+terminal PR_ENTERO, PR_DECIMAL, PR_CADENA;
+terminal OP_SUMA, OP_RESTA, OP_MULT, OP_DIV, OP_CONCAT, OP_ASIG;
+terminal IDENTIFICADOR, VAL_ENTERO, VAL_DECIMAL, VAL_CADENA, PUNTO_COMA;
+
+non terminal INICIO, LISTA_SENTENCIAS, SENTENCIA, DECLARACION, EXPRESION;
+
+precedence left OP_SUMA, OP_RESTA, OP_CONCAT;
+precedence left OP_MULT, OP_DIV;
+
+start with INICIO;
+
+INICIO ::= LISTA_SENTENCIAS;
+
+LISTA_SENTENCIAS ::= LISTA_SENTENCIAS SENTENCIA
+                   | SENTENCIA
+                   ;
+
+SENTENCIA ::= DECLARACION PUNTO_COMA
+            | error PUNTO_COMA
+            ;
+
+DECLARACION ::= PR_ENTERO IDENTIFICADOR OP_ASIG EXPRESION
+              | PR_DECIMAL IDENTIFICADOR OP_ASIG EXPRESION
+              | PR_CADENA IDENTIFICADOR OP_ASIG EXPRESION
+              ;
+
+EXPRESION ::= VAL_ENTERO
+            | VAL_DECIMAL
+            | VAL_CADENA
+            | IDENTIFICADOR
+            | EXPRESION OP_SUMA EXPRESION
+            | EXPRESION OP_RESTA EXPRESION
+            | EXPRESION OP_MULT EXPRESION
+            | EXPRESION OP_DIV EXPRESION
+            | EXPRESION OP_CONCAT EXPRESION
+            ;
