@@ -1,6 +1,9 @@
 {
+    "java.project.sourcePaths": [
+        "Placeholder/src"
+    ],
+    "java.project.outputPath": "Placeholder/bin",
     "java.project.referencedLibraries": [
-        "lib/**/*.jar",
         "Placeholder/lib/java-cup-11b.jar",
         "Placeholder/lib/java-cup-11b-runtime.jar",
         "Placeholder/lib/jflex-full-1.9.1.jar"
