@@ -1,0 +1,100 @@
+package analizadores;
+import java_cup.runtime.*;
+import codigo.*;
+
+/* 1. Instanciamos la tabla de símbolos para que todas las reglas la usen */
+action code {:
+    TablaSimbolos tabla = new TablaSimbolos();
+:};
+
+parser code {:
+    public void syntax_error(Symbol s){
+        if (expected_token_ids().contains(sym.PUNTO_COMA)) {
+            throw new FaltaPuntoYComaException(s.left, s.right);
+        }
+        throw new ExcepcionSintactica("Error de estructura cerca de: " + s.value, s.left, s.right);
+    }
+:};
+
+/* 2. Terminales y No Terminales */
+terminal PR_ENTERO, PR_DECIMAL, PR_CADENA;
+terminal OP_SUMA, OP_RESTA, OP_MULT, OP_DIV, OP_CONCAT, OP_ASIG;
+terminal String IDENTIFICADOR, VAL_ENTERO, VAL_DECIMAL, VAL_CADENA, PUNTO_COMA;
+
+// Importante: EXPRESION ahora devuelve un String con el TIPO de dato
+non terminal INICIO, LISTA_SENTENCIAS, SENTENCIA, DECLARACION;
+non terminal String EXPRESION; 
+
+precedence left OP_SUMA, OP_RESTA, OP_CONCAT;
+precedence left OP_MULT, OP_DIV;
+
+start with INICIO;
+
+/* 3. Reglas con Lógica Semántica */
+
+INICIO ::= LISTA_SENTENCIAS ;
+
+LISTA_SENTENCIAS ::= LISTA_SENTENCIAS SENTENCIA | SENTENCIA ;
+
+SENTENCIA ::= DECLARACION PUNTO_COMA ;
+
+DECLARACION ::= 
+      PR_ENTERO IDENTIFICADOR:id OP_ASIG EXPRESION:e
+      {: 
+          // SEMÁNTICA 1: Revisar si la variable ya existe
+          tabla.insertar(id, "ENTERO", idleft, idright); 
+          
+          // SEMÁNTICA 2: Validar tipos (si e no es entero)
+          if(!e.equals("ENTERO")) {
+              throw new TiposIncompatiblesException("ENTERO", e, idleft, idright);
+          }
+          System.out.println("Variable " + id + " declarada como ENTERO.");
+      :}
+    | PR_CADENA IDENTIFICADOR:id OP_ASIG EXPRESION:e
+      {: 
+          tabla.insertar(id, "CADENA", idleft, idright);
+          if(!e.equals("CADENA")) {
+              throw new TiposIncompatiblesException("CADENA", e, idleft, idright);
+          }
+      :}
+    | IDENTIFICADOR:id OP_ASIG EXPRESION:e
+      {:
+          // SEMÁNTICA 3: Revisar si la variable fue declarada antes de asignarle algo
+          tabla.verificarExistencia(id, idleft, idright);
+          String tipoOriginal = tabla.getTipo(id);
+          if(!tipoOriginal.equals(e)) {
+              throw new TiposIncompatiblesException(tipoOriginal, e, idleft, idright);
+          }
+      :}
+    ;
+
+EXPRESION ::= 
+      VAL_ENTERO    {: RESULT = "ENTERO"; :}
+    | VAL_DECIMAL   {: RESULT = "DECIMAL"; :}
+    | VAL_CADENA    {: RESULT = "CADENA"; :}
+    | IDENTIFICADOR:id 
+      {: 
+          tabla.verificarExistencia(id, idleft, idright);
+          RESULT = tabla.getTipo(id); 
+      :}
+    | EXPRESION:e1 OP_SUMA EXPRESION:e2
+      {: 
+          if(!e1.equals("ENTERO") || !e2.equals("ENTERO")) {
+              throw new OperacionNoValidaException("ruchi (+)", e1, e1left, e1right);
+          }
+          RESULT = "ENTERO"; 
+      :}
+    | EXPRESION:e1 OP_DIV EXPRESION:e2
+      {: 
+          // SEMÁNTICA 4: División por cero (suponiendo que e2 es literal 0)
+          // Nota: Para hacerlo con variables, necesitarías guardar el VALOR en la tabla también
+          if(e2.equals("0")) throw new DivisionPorCeroException(e2left, e2right);
+          RESULT = "ENTERO";
+      :}
+    | EXPRESION:e1 OP_CONCAT EXPRESION:e2
+      {: 
+          // SEMÁNTICA 5: Operación no válida (tzo solo para cadenas)
+          if(!e1.equals("CADENA")) throw new OperacionNoValidaException("tzo", e1, e1left, e1right);
+          RESULT = "CADENA";
+      :}
+    ;
